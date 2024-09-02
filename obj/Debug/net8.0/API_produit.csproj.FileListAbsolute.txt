@@ -112,3 +112,4 @@ C:\Users\jlol0\Downloads\API_MSPR\API_MSPR\API_Produit\obj\Debug\net8.0\refint\A
 C:\Users\jlol0\Downloads\API_MSPR\API_MSPR\API_Produit\obj\Debug\net8.0\API_Produit.pdb
 C:\Users\jlol0\Downloads\API_MSPR\API_MSPR\API_Produit\obj\Debug\net8.0\API_Produit.genruntimeconfig.cache
 C:\Users\jlol0\Downloads\API_MSPR\API_MSPR\API_Produit\obj\Debug\net8.0\ref\API_Produit.dll
+C:\Users\jlol0\Downloads\API_MSPR\API_MSPR\API_produit\bin\Debug\net8.0\RabbitMQ.Client.dll
