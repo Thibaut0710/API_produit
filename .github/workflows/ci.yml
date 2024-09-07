@@ -1,0 +1,204 @@
+name: CI/CD
+
+
+on:
+  push:
+    branches: 
+      - master
+  pull_request:
+    types: [closed]
+    branches: 
+      - master
+  release:
+    types: [release]
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.x'
+
+    - name: Install Chrome and ChromeDriver
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        LATEST=$(wget -q -O - https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+        wget https://chromedriver.storage.googleapis.com/$LATEST/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+        sudo mv chromedriver /usr/local/bin/
+    
+    - name: Install Dependencies
+      run: dotnet restore HotelBookingSystemSolution.sln
+
+    - name: Build
+      run: dotnet build HotelBookingSystemSolution.sln --no-restore
+
+    - name: Run Tests Non-Graphic
+      run: dotnet test HotelBookingSystemSolution.sln --no-build --verbosity normal --filter TestCategory!=UITest --logger "trx;LogFileName=non_graphic_tests.trx"
+      env:
+        TOKEN_KEY_SECRET: ${{ secrets.TOKEN_KEY_SECRET }}
+        DB_STRING_SECRET: ${{ secrets.DB_STRING_SECRET }}
+    
+    - name: Report Tests
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Non-Graphic Tests
+        path: '**/non_graphic_tests.trx'
+        reporter: dotnet-trx
+
+    - name: Run Tests Selenium
+      run: dotnet test HotelBookingSystemSolution.sln --no-build --verbosity normal --filter TestCategory=UITest
+      continue-on-error: true
+      env:
+        TOKEN_KEY_SECRET: ${{ secrets.TOKEN_KEY_SECRET }}
+        DB_STRING_SECRET: ${{ secrets.DB_STRING_SECRET }}
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        path: master
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.x'
+
+    - name: Install Dependencies
+      run: dotnet restore master/HotelBookingSystemSolution.sln
+
+    - name: Build
+      run: dotnet build master/HotelBookingSystemSolution.sln --no-restore
+
+    - name: Publish APIs
+      run: |
+        for api in HotelInformationAPI RoomReservationAPI UserRegistrationAPI; do
+          echo "Publishing $api..."
+          dotnet publish master/$api/$api.csproj -c Release -o master/$api/publish/$api
+          echo "Published $api to master/$api/publish/$api"
+        done
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: release_artifact
+        path: master
+        retention-seconds: 600
+
+  release:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master'
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GIT_TOKEN }}
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: release_artifact
+        path: master
+  
+    - name: Bump version
+      id: package_version
+      uses: KageKirin/bump-csproj-version@v0
+      with:
+        file: HotelInformationAPI/HotelInformationAPI.csproj
+        patch: true
+
+    - name: Commit new version
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git commit -am "CI: bump version to ${{ steps.package_version.outputs.version  }}"
+        git push https://${{ secrets.GIT_TOKEN }}@github.com/${{ github.repository }}.git
+    
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.MAX_TOKEN }}
+      with:
+        tag_name: v${{ steps.package_version.outputs.version }}
+        release_name: Release ${{ steps.package_version.outputs.version }}
+        draft: false
+        prerelease: false
+
+    - name: Compress Published APIs
+      run: |
+        zip -r HotelInformationAPI.zip master/HotelInformationAPI/publish/HotelInformationAPI
+        zip -r RoomReservationAPI.zip master/RoomReservationAPI/publish/RoomReservationAPI
+        zip -r UserRegistrationAPI.zip master/UserRegistrationAPI/publish/UserRegistrationAPI
+    
+    - name: Upload Release Assets - HotelInformationAPI
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.MAX_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./HotelInformationAPI.zip
+        asset_name: HotelInformationAPI.zip
+        asset_content_type: application/zip
+
+    - name: Upload Release Assets - RoomReservationAPI
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.MAX_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./RoomReservationAPI.zip
+        asset_name: RoomReservationAPI.zip
+        asset_content_type: application/zip
+
+    - name: Upload Release Assets - UserRegistrationAPI
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.MAX_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./UserRegistrationAPI.zip
+        asset_name: UserRegistrationAPI.zip
+        asset_content_type: application/zip
+
+  deploy_pages:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2 
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+ 
+    - name: Install redoc-cli
+      run: npm install -g redoc-cli
+ 
+    - name: Generate HTML from openapi.json
+      run: redoc-cli bundle -o public/index.html ./openapi.json
+ 
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.MAX_TOKEN }}
+        publish_dir: ./public
