@@ -89,7 +89,7 @@ jobs:
 
     - name: Publish APIs
       run: |
-        for api in HotelInformationAPI RoomReservationAPI UserRegistrationAPI; do
+        for api in API_produit RoomReservationAPI UserRegistrationAPI; do
           echo "Publishing $api..."
           dotnet publish master/$api/$api.csproj -c Release -o master/$api/publish/$api
           echo "Published $api to master/$api/publish/$api"
@@ -123,7 +123,7 @@ jobs:
       id: package_version
       uses: KageKirin/bump-csproj-version@v0
       with:
-        file: HotelInformationAPI/HotelInformationAPI.csproj
+        file: API_produit/API_produit.csproj
         patch: true
 
     - name: Commit new version
@@ -146,18 +146,18 @@ jobs:
 
     - name: Compress Published APIs
       run: |
-        zip -r HotelInformationAPI.zip master/HotelInformationAPI/publish/HotelInformationAPI
+        zip -r API_produit.zip master/API_produit/publish/API_produit
         zip -r RoomReservationAPI.zip master/RoomReservationAPI/publish/RoomReservationAPI
         zip -r UserRegistrationAPI.zip master/UserRegistrationAPI/publish/UserRegistrationAPI
     
-    - name: Upload Release Assets - HotelInformationAPI
+    - name: Upload Release Assets - API_produit
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.MAX_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./HotelInformationAPI.zip
-        asset_name: HotelInformationAPI.zip
+        asset_path: ./API_produit.zip
+        asset_name: API_produit.zip
         asset_content_type: application/zip
 
     - name: Upload Release Assets - RoomReservationAPI
