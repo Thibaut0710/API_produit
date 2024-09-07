@@ -41,13 +41,13 @@ jobs:
         sudo mv chromedriver /usr/local/bin/
     
     - name: Install Dependencies
-      run: dotnet restore HotelBookingSystemSolution.sln
+      run: dotnet restore API_produit.sln
 
     - name: Build
-      run: dotnet build HotelBookingSystemSolution.sln --no-restore
+      run: dotnet build API_produit.sln --no-restore
 
     - name: Run Tests Non-Graphic
-      run: dotnet test HotelBookingSystemSolution.sln --no-build --verbosity normal --filter TestCategory!=UITest --logger "trx;LogFileName=non_graphic_tests.trx"
+      run: dotnet test API_produit.sln --no-build --verbosity normal --filter TestCategory!=UITest --logger "trx;LogFileName=non_graphic_tests.trx"
       env:
         TOKEN_KEY_SECRET: ${{ secrets.TOKEN_KEY_SECRET }}
         DB_STRING_SECRET: ${{ secrets.DB_STRING_SECRET }}
@@ -61,7 +61,7 @@ jobs:
         reporter: dotnet-trx
 
     - name: Run Tests Selenium
-      run: dotnet test HotelBookingSystemSolution.sln --no-build --verbosity normal --filter TestCategory=UITest
+      run: dotnet test API_produit.sln --no-build --verbosity normal --filter TestCategory=UITest
       continue-on-error: true
       env:
         TOKEN_KEY_SECRET: ${{ secrets.TOKEN_KEY_SECRET }}
@@ -82,10 +82,10 @@ jobs:
         dotnet-version: '8.x'
 
     - name: Install Dependencies
-      run: dotnet restore master/HotelBookingSystemSolution.sln
+      run: dotnet restore master/API_produit.sln
 
     - name: Build
-      run: dotnet build master/HotelBookingSystemSolution.sln --no-restore
+      run: dotnet build master/API_produit.sln --no-restore
 
     - name: Publish APIs
       run: |
