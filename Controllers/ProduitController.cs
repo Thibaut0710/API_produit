@@ -16,47 +16,45 @@ namespace API_produit.Controllers
             _context = context;
         }
 
-        // GET: api/products
+        // GET: api/produits
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Produit>>> GetProducts()
         {
-            return await _context.Produits.ToListAsync();
+            return await _context.Produits.AsNoTracking().ToListAsync();
         }
 
-        // GET: api/products/{id}
+        // GET: api/produits/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Produit>> GetProduct(int id)
         {
-            var product = await _context.Produits.FindAsync(id);
+            var product = await _context.Produits.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
             {
                 return NotFound(new { message = "Produit non trouvé." });
             }
 
-            return product;
+            return Ok(product);
         }
 
-        // GET: produit in commande
+        // GET: api/produits/produitInCommande
         [HttpGet("produitInCommande")]
         public async Task<ActionResult<List<Produit>>> GetProduitInCommande([FromQuery] List<int> produitsId)
         {
-            // Utilisation de .Contains pour vérifier si les produits sont dans la liste
             var produits = await _context.Produits
                                          .Where(produit => produitsId.Contains(produit.Id))
+                                         .AsNoTracking()
                                          .ToListAsync();
 
-            // Vérifier si des produits existent
-            if (produits == null || !produits.Any())
+            if (!produits.Any())
             {
-                return NotFound(new { message = "Aucun produit trouvé dans la commande" });
+                return NotFound(new { message = "Aucun produit trouvé dans la commande." });
             }
 
             return Ok(produits);
         }
 
-
-        // POST:
+        // POST: api/produits
         [HttpPost]
         public async Task<IActionResult> CreateProduit([FromBody] Produit produit)
         {
@@ -70,21 +68,31 @@ namespace API_produit.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Ajouter le produit à la base de données
             _context.Produits.Add(produit);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Une erreur est survenue lors de la création du produit.", detail = ex.Message });
+            }
 
-            // Retourner une réponse avec le code 201 Created et l'objet produit ajouté
             return CreatedAtAction(nameof(GetProduct), new { id = produit.Id }, produit);
         }
 
-        // PUT: api/products/{id}
+        // PUT: api/produits/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Produit product)
+        public async Task<IActionResult> PutProduct(int id, [FromBody] Produit product)
         {
             if (id != product.Id)
             {
                 return BadRequest(new { message = "L'ID du produit ne correspond pas à l'ID dans l'URL." });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             _context.Entry(product).State = EntityState.Modified;
@@ -104,11 +112,15 @@ namespace API_produit.Controllers
                     throw;
                 }
             }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Une erreur est survenue lors de la mise à jour du produit.", detail = ex.Message });
+            }
 
             return Ok(new { message = "Produit mis à jour avec succès." });
         }
 
-        // DELETE: api/products/{id}
+        // DELETE: api/produits/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
@@ -119,7 +131,14 @@ namespace API_produit.Controllers
             }
 
             _context.Produits.Remove(product);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Une erreur est survenue lors de la suppression du produit.", detail = ex.Message });
+            }
 
             return Ok(new { message = "Produit supprimé avec succès." });
         }
