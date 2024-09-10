@@ -1,6 +1,6 @@
 using API_produit.Context;
 using Microsoft.EntityFrameworkCore;
-
+using Prometheus;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,6 +14,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMetricServer();
+app.UseHttpMetrics();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
