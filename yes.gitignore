@@ -1,0 +1,74 @@
+# Fichiers de build générés
+bin/
+obj/
+out/
+
+# Répertoires de projet spécifiques à Visual Studio
+.vs/
+.idea/
+.vscode/
+
+# Fichiers de configuration utilisateur de Visual Studio
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs, Debug et fichiers de profil
+*.log
+*.pidb
+*.psess
+*.vsp
+*.vspx
+*.vshost.exe*
+*.tmd
+
+# Répertoires de test
+TestResults/
+
+# Fichiers de packages NuGet
+packages/
+*.nupkg
+# Si vous utilisez .NET Core ou .NET 5+
+*.nuget/
+
+# Paramètres de publication et de génération locaux
+publish/
+*.PublishProfiles/
+
+# Fichiers de dépendance générés
+project.lock.json
+project.fragment.lock.json
+
+# Secrets utilisateur
+secrets.json
+
+# Fichiers de verrouillage de dépendances
+global.json
+
+# Caches du gestionnaire de packages
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Configuration de conteneur Docker
+.dockerignore
+docker-compose*.yml
+
+# Dossiers de composants Blazor
+.scaffolding
+
+# Fichiers de build de serveur Azure
+azure-pipelines.yml
+
+# Divers fichiers de sauvegarde
+*.bak
+*.swp
+*.orig
+*.tmp
+*.temp
+
+# Certificats SSL locaux
+*.pfx
+*.p12
