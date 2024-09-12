@@ -5,10 +5,12 @@ on:
   push:
     branches: 
       - master
+      - ci-cd
   pull_request:
     types: [closed]
     branches: 
       - master
+      - ci-cd
   release:
     types: [release]
 
