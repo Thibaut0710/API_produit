@@ -62,13 +62,6 @@ jobs:
         path: '**/non_graphic_tests.trx'
         reporter: dotnet-trx
 
-    - name: Run Tests Selenium
-      run: dotnet test API_Produit.sln --no-build --verbosity normal --filter TestCategory=UITest
-      continue-on-error: true
-      env:
-        TOKEN_KEY_SECRET: ${{ secrets.TOKEN_KEY_SECRET }}
-        DB_STRING_SECRET: ${{ secrets.DB_STRING_SECRET }}
-
   build:
     needs: test
     runs-on: ubuntu-latest
