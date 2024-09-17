@@ -22,7 +22,9 @@ WORKDIR /app/out
 
 COPY init-mariadb.sh /usr/local/bin/init-mariadb.sh
 RUN chmod +x /usr/local/bin/init-mariadb.sh
+RUN dotnet dev-certs https -ep /https/aspnetapp.pfx -p "YourPassword" && \
+    dotnet dev-certs https --trust
 
-EXPOSE 3306 5057
+EXPOSE 7118 5057
 
 CMD ["init-mariadb.sh"]

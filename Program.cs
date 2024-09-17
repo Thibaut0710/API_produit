@@ -32,7 +32,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        policy => policy.WithOrigins("http://localhost:5239")  
+        policy => policy.WithOrigins("https://0.0.0.0:7118")  
         .AllowAnyMethod()
         .AllowAnyHeader());
 });
@@ -50,7 +50,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<ProduitService>();
 builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
 builder.Services.AddSingleton<RabbitMQConsumer>();
-builder.WebHost.UseUrls("http://0.0.0.0:5057");
+builder.WebHost.UseUrls("https://0.0.0.0:7118");
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -90,7 +90,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 //// Activer CORS
-//app.UseCors("CorsPolicy");
+app.UseCors("CorsPolicy");
 
 // Activer l'authentification et l'autorisation
 app.UseAuthentication();
