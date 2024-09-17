@@ -2,6 +2,10 @@
 bin/
 obj/
 out/
+bin/Debug/net8.0/
+obj/Debug/net8.0/
+
+
 
 # Répertoires de projet spécifiques à Visual Studio
 .vs/
