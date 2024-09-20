@@ -1,0 +1,262 @@
+{
+	"info": {
+		"_postman_id": "3d953b6f-8d5b-4282-9dc4-7416a0e98277",
+		"name": "API Produit Collection",
+		"description": "Collection Postman pour l'API Produit",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14572247"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpassword\"\n}"
+				},
+				"url": {
+					"raw": "https://localhost:7118/api/AuthProduit/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7118",
+					"path": [
+						"api",
+						"AuthProduit",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all products",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7118/api/Produit",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7118",
+					"path": [
+						"api",
+						"Produit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get product by ID",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7118/api/Produit/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7118",
+					"path": [
+						"api",
+						"Produit",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get products in order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7118/api/Produit/produitInCommande?produitsId=1&produitsId=2",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7118",
+					"path": [
+						"api",
+						"Produit",
+						"produitInCommande"
+					],
+					"query": [
+						{
+							"key": "produitsId",
+							"value": "1"
+						},
+						{
+							"key": "produitsId",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new product",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Café Colombia\",\n    \"description\": \"Un café de haute qualité.\",\n    \"price\": 8.50,\n    \"stock\": 100\n}"
+				},
+				"url": {
+					"raw": "https://localhost:7118/api/Produit",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7118",
+					"path": [
+						"api",
+						"Produit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a product",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1,\n    \"name\": \"Café Brasilia\",\n    \"description\": \"Un café doux et équilibré.\",\n    \"price\": 9.00,\n    \"stock\": 150\n}"
+				},
+				"url": {
+					"raw": "https://localhost:7118/api/Produit/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7118",
+					"path": [
+						"api",
+						"Produit",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a product",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7118/api/Produit/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7118",
+					"path": [
+						"api",
+						"Produit",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "jwt_token",
+			"value": ""
+		}
+	]
+}
