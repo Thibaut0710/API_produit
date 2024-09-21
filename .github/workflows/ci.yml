@@ -33,17 +33,17 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t API-Produit:latest .
+          docker build -t api-produit:latest .
 
       - name: Save Docker image to file
         run: |
-          docker save API-Produit:latest | gzip > API-Produit-latest.tar.gz
+          docker save api-produit:latest | gzip > api-produit-latest.tar.gz
 
       - name: Upload Docker image as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: API-Produit-docker-image
-          path: API-Produit-latest.tar.gz
+          name: api-produit-docker-image
+          path: api-produit-latest.tar.gz
     
 
   test:
