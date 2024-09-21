@@ -61,39 +61,99 @@ public class RabbitMQService : IRabbitMQService
                     var message = Encoding.UTF8.GetString(body);
                     Console.WriteLine("Received message: " + message);
 
-                    // Désérialiser le message JSON en liste d'IDs
-                    List<int> produitsId = null;
+                    List<int> produitsId = new List<int>();
+                    List<dynamic> commandesList = new List<dynamic>();
+
+                    // Désérialisation manuelle pour extraire les ProduitIDs et la commande
                     try
                     {
-                        produitsId = JsonSerializer.Deserialize<List<int>>(message);
+                        using (JsonDocument doc = JsonDocument.Parse(message))
+                        {
+                            var commandes = doc.RootElement.EnumerateArray(); // Supposant que le JSON contient une liste de commandes
+                            foreach (var commande in commandes)
+                            {
+                                // Extraire les propriétés de la commande
+                                int id = commande.GetProperty("Id").GetInt32();
+                                string customerName = commande.GetProperty("CustomerName").GetString();
+                                DateTime orderDate = commande.GetProperty("OrderDate").GetDateTime();
+                                decimal totalAmount = commande.GetProperty("TotalAmount").GetDecimal();
+                                int clientId = commande.GetProperty("ClientID").GetInt32();
+
+                                // Récupérer les ProduitIDs de la commande
+                                if (commande.TryGetProperty("ProduitIDs", out JsonElement produitIdsElement))
+                                {
+                                    var produitIds = produitIdsElement.EnumerateArray().Select(p => p.GetInt32()).ToList();
+                                    produitsId.AddRange(produitIds);
+
+                                    // Construire une structure dynamique pour la commande avec les propriétés récupérées
+                                    commandesList.Add(new
+                                    {
+                                        Id = id,
+                                        CustomerName = customerName,
+                                        OrderDate = orderDate,
+                                        TotalAmount = totalAmount,
+                                        ClientID = clientId,
+                                        ProduitIDs = produitIds,
+                                        Produits = new List<dynamic>() // Placeholder pour les produits qui seront ajoutés plus tard
+                                    });
+                                }
+                            }
+                        }
                     }
                     catch (JsonException ex)
                     {
                         Console.WriteLine("Erreur de désérialisation : " + ex.Message);
-                        // Acknowledge the message even if there's an error
+
+                        // Préparer le message d'erreur
+                        var errorResponse = new
+                        {
+                            Error = "Erreur de désérialisation",
+                            Message = ex.Message
+                        };
+
+                        // Créer les propriétés du message de réponse avec le CorrelationId d'origine
+                        var replyProperties = channel.CreateBasicProperties();
+                        replyProperties.CorrelationId = ea.BasicProperties.CorrelationId;
+
+                        // Envoyer la réponse d'erreur à la queue de réponse
+                        string errorJsonResponse = JsonSerializer.Serialize(errorResponse);
+                        channel.BasicPublish(
+                            exchange: string.Empty,
+                            routingKey: ea.BasicProperties.ReplyTo,
+                            basicProperties: replyProperties,
+                            body: Encoding.UTF8.GetBytes(errorJsonResponse));
+
+                        // Acknowledge the message
                         channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                         return;
                     }
 
-                    if (produitsId != null && produitsId.Count > 0)
+                    if (produitsId.Count > 0)
                     {
                         using (var scope = _scopeFactory.CreateScope())
                         {
                             var context = scope.ServiceProvider.GetRequiredService<ProduitContext>();
 
                             // Obtenir les produits depuis la base de données
-                            var response = await context.Produits.Where(produit => produitsId.Contains(produit.Id)).ToListAsync();
-                            Console.WriteLine("Produits trouvés : " + string.Join(", ", response.Select(p => p.Id)));
+                            var produitsTrouves = await context.Produits.Where(produit => produitsId.Contains(produit.Id)).ToListAsync();
+                            Console.WriteLine("Produits trouvés : " + string.Join(", ", produitsTrouves.Select(p => p.Id)));
 
-                            // Préparer la réponse en JSON
-                            var produits = response.Select(produit => new
+                            // Associer les produits trouvés aux commandes correspondantes
+                            foreach (var commande in commandesList)
                             {
-                                produit.Id,
-                                produit.Name // Ajoutez d'autres propriétés si nécessaire
-                            }).ToList();
+                                commande.Produits.AddRange(
+                                    produitsTrouves.Where(p => commande.ProduitIDs.Contains(p.Id)).Select(produit => new
+                                    {
+                                        produit.Id,
+                                        produit.Name
+                                        // Ajoutez d'autres propriétés si nécessaire
+                                    })
+                                );
+                            }
 
-                            string json = JsonSerializer.Serialize(produits);
-                            Console.WriteLine("Réponse JSON : " + json);
+                            // Préparer la réponse en JSON avec la commande et les produits associés
+                            string jsonResponse = JsonSerializer.Serialize(commandesList);
+                            Console.WriteLine("Réponse JSON : " + jsonResponse);
 
                             // Créer les propriétés du message de réponse avec le CorrelationId d'origine
                             var replyProperties = channel.CreateBasicProperties();
@@ -102,14 +162,33 @@ public class RabbitMQService : IRabbitMQService
                             // Envoyer la réponse à la queue de réponse
                             channel.BasicPublish(
                                 exchange: string.Empty,
-                                routingKey: ea.BasicProperties.ReplyTo, // La queue de réponse est spécifiée dans le message original
+                                routingKey: ea.BasicProperties.ReplyTo,
                                 basicProperties: replyProperties,
-                                body: Encoding.UTF8.GetBytes(json));
+                                body: Encoding.UTF8.GetBytes(jsonResponse));
                         }
                     }
                     else
                     {
                         Console.WriteLine("Aucun ID de produit valide trouvé dans le message.");
+
+                        // Préparer le message d'erreur pour l'absence d'ID de produit
+                        var noProductResponse = new
+                        {
+                            Error = "Aucun ID de produit valide trouvé",
+                            Message = "Aucun ID de produit valide trouvé dans le message."
+                        };
+
+                        // Créer les propriétés du message de réponse avec le CorrelationId d'origine
+                        var replyProperties = channel.CreateBasicProperties();
+                        replyProperties.CorrelationId = ea.BasicProperties.CorrelationId;
+
+                        // Envoyer la réponse d'erreur à la queue de réponse
+                        string noProductJsonResponse = JsonSerializer.Serialize(noProductResponse);
+                        channel.BasicPublish(
+                            exchange: string.Empty,
+                            routingKey: ea.BasicProperties.ReplyTo,
+                            basicProperties: replyProperties,
+                            body: Encoding.UTF8.GetBytes(noProductJsonResponse));
                     }
 
                     // Acknowledge the message
@@ -123,15 +202,11 @@ public class RabbitMQService : IRabbitMQService
                 // Keep the thread alive while consuming messages
                 while (true)
                 {
-                    // Add any additional logic needed to keep the consumer alive,
-                    // such as waiting for cancellation tokens or other termination signals.
                     await Task.Delay(1000); // Ajoute un délai pour éviter une boucle infinie qui consomme trop de CPU
                 }
             }
         });
     }
-
-
 
     public async Task<string> SendMessageAndWaitForResponseAsync(string message, string CommandQueueName, string ReplyQueueName)
     {

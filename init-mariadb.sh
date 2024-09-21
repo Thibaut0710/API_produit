@@ -27,6 +27,13 @@ else
     echo "Database '${MYSQL_DATABASE}' already initialized. Skipping initialization."
 fi
 
+echo "Generating new migrations..."
+dotnet ef migrations add UpdateMigration --project /app/API_Produit.csproj
+
+echo "Running migrations..."
+dotnet ef database update --project /app/API_Produit.csproj
+
 # Lancer l'application .NET
+echo "Starting the .NET application..."
 dotnet API_Produit.dll
 
