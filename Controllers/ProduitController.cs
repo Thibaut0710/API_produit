@@ -1,5 +1,6 @@
 ﻿using API_produit.Context;
 using API_produit.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace API_produit.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProduitController : ControllerBase
     {
         private readonly ProduitContext _context;
