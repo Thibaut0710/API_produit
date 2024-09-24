@@ -89,7 +89,7 @@ jobs:
         echo "Published API_Produit to master/publish/API_Produit"
 
     - name: Upload Build Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: release_artifact
         path: master
@@ -116,7 +116,7 @@ jobs:
           docker save api-produit:latest | gzip > api-produit-latest.tar.gz
 
       - name: Upload Docker image as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: api-produit-docker-image
           path: api-produit-latest.tar.gz
@@ -134,16 +134,16 @@ jobs:
         token: ${{ secrets.GIT_TOKEN }}
         
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: release_artifact
-        path: api-produit-latest.tar.gz
+        path: master
     
     - name: Download Docker image artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: api-produit-docker-image
-        path: master
+        path: api-produit-latest.tar.gz
 
     - name: Generate dynamic tag name
       id: generate_tag
