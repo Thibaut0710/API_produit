@@ -154,8 +154,6 @@ jobs:
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.MAX_TOKEN }}
       with:
         tag_name: v${{ steps.package_version.outputs.version }}
         release_name: Release ${{ steps.package_version.outputs.version }}
@@ -168,8 +166,6 @@ jobs:
     
     - name: Upload Release Assets - API_Produit
       uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.MAX_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./API_Produit.zip
