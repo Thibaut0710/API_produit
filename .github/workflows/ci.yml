@@ -73,18 +73,10 @@ jobs:
       run: dotnet build API_Produit.csproj --no-restore
 
     - name: Run Tests Non-Graphic
-      run: dotnet test API_Produit.csproj --no-build --verbosity normal --filter TestCategory!=UITest --logger "trx;LogFileName=non_graphic_tests.trx"
+      run: dotnet test API_Produit.csproj
       env:
         TOKEN_KEY_SECRET: ${{ secrets.TOKEN_KEY_SECRET }}
         DB_STRING_SECRET: ${{ secrets.DB_STRING_SECRET }}
-    
-    - name: Report Tests
-      uses: dorny/test-reporter@v1
-      if: always()
-      with:
-        name: Non-Graphic Tests
-        path: '**/non_graphic_tests.trx'
-        reporter: dotnet-trx
 
   build:
     needs: test
