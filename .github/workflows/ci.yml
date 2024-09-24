@@ -72,7 +72,7 @@ jobs:
     - name: Clean
       run: |
         dotnet clean ./API_Produit.Tests/API_Produit.Tests.csproj
-        dotnet clean ./API_Produit.Tests/API_Produit.Tests.csproj
+        dotnet clean API_Produit.csproj
     
     - name: Install Dependencies
       run: dotnet restore ./API_Produit.Tests/API_Produit.Tests.csproj
