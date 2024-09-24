@@ -74,9 +74,6 @@ jobs:
 
     - name: Run Tests Non-Graphic
       run: dotnet test API_Produit.csproj
-      env:
-        TOKEN_KEY_SECRET: ${{ secrets.TOKEN_KEY_SECRET }}
-        DB_STRING_SECRET: ${{ secrets.DB_STRING_SECRET }}
 
   build:
     needs: test
