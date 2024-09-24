@@ -168,6 +168,16 @@ jobs:
       run: |
         zip -r API_Produit.zip .
 
+    - name: Upload Release Assets - API_Produit
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./API_Produit.zip
+        asset_name: API_Produit.zip
+        asset_content_type: application/zip
+        
     - name: Upload Docker image to release
       uses: actions/upload-release-asset@v1
       env:
@@ -178,12 +188,3 @@ jobs:
         asset_name: api-produit-latest.tar.gz
         asset_content_type: application/gzip
     
-    - name: Upload Release Assets - API_Produit
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./API_Produit.zip
-        asset_name: API_Produit.zip
-        asset_content_type: application/zip
