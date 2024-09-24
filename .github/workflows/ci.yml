@@ -131,7 +131,7 @@ jobs:
           
   release:
     #if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master'
-    needs: build
+    needs: docker-container-artifact
     runs-on: ubuntu-latest
 
     steps:
@@ -145,21 +145,45 @@ jobs:
       with:
         name: release_artifact
         path: master
+    
+    - name: Download Docker image artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: api-produit-docker-image
+        path: ./ 
 
+    - name: Generate dynamic tag name
+      id: generate_tag
+      run: |
+        DATE_TAG=$(date +'%Y%m%d%H%M%S')
+        COMMIT_HASH=$(git rev-parse --short HEAD)
+        TAG_NAME="release-$DATE_TAG-$COMMIT_HASH"
+        echo "::set-output name=tag_name::$TAG_NAME"
+        
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
       with:
-        tag_name: v1.0.2
-        release_name: "Release v1.0.2"
+        tag_name: ${{ steps.generate_tag.outputs.tag_name }}
+        release_name: "Release ${{ steps.generate_tag.outputs.tag_name }}"
         draft: false
         prerelease: false
 
     - name: Zip source code
       run: |
         zip -r API_Produit.zip .
+
+    - name: Upload Docker image to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./api-produit-latest.tar.gz
+        asset_name: api-produit-latest.tar.gz
+        asset_content_type: application/gzip
     
     - name: Upload Release Assets - API_Produit
       uses: actions/upload-release-asset@v1
