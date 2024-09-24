@@ -183,7 +183,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./
+        asset_path: ./api-produit-latest.tar.gz
         asset_name: api-produit-latest.tar.gz
         asset_content_type: application/gzip
         
