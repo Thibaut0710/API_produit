@@ -70,13 +70,13 @@ jobs:
       run: dotnet add package Newtonsoft.Json
     
     - name: Install Dependencies
-      run: dotnet restore API_Produit.csproj
+      run: dotnet restore ./API_Produit.Tests/API_Produit.csproj
 
     - name: Build
-      run: dotnet build API_Produit.csproj --no-restore
+      run: dotnet build ./API_Produit.Tests/API_Produit.csproj --no-restore
 
     - name: Run Unit Tests
-      run: dotnet test API_Produit.csproj
+      run: dotnet test ./API_Produit.Tests/API_Produit.csproj
 
   build:
     needs: test
