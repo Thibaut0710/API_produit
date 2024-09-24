@@ -182,7 +182,7 @@ jobs:
       run: npm install -g redoc-cli
  
     - name: Generate HTML from openapi.json
-      run: redoc-cli bundle -o public/index.html ./openapi.json
+      run: npx @redocly/cli build-docs public/index.html ./openapi.json
  
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
