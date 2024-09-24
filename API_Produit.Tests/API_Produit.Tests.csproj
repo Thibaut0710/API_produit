@@ -23,10 +23,8 @@
     </PackageReference>
   </ItemGroup>
 
-<!--
   <ItemGroup>
     <ProjectReference Include="..\API_Produit.csproj" />
   </ItemGroup>
-  -->
 
 </Project>
