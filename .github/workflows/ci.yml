@@ -120,14 +120,6 @@ jobs:
         with:
           name: api-produit-docker-image
           path: api-produit-latest.tar.gz
-    
-      - name: Release Docker image
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./api-produit-latest.tar.gz
-          asset_name: api-produit-latest.tar.gz
-          asset_content_type: application/gzip
           
   release:
     #if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master'
