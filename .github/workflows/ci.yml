@@ -143,7 +143,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: api-produit-docker-image
-        path: api-produit-latest.tar.gz
+        path: master
 
     - name: Generate dynamic tag name
       id: generate_tag
