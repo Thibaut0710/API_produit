@@ -120,6 +120,7 @@ jobs:
         with:
           name: api-produit-docker-image
           path: api-produit-latest.tar.gz
+          retention-seconds: 600
           
   release:
     #if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master'
@@ -173,8 +174,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: api-produit-latest.tar.gz
-        asset_name: api-produit-docker-image
+        asset_path: ./api-produit-latest.tar.gz
+        asset_name: api-produit-latest.tar.gz
         asset_content_type: application/gzip
     
     - name: Upload Release Assets - API_Produit
