@@ -168,6 +168,10 @@ jobs:
       run: |
         zip -r API_Produit.zip .
         
+    - name: Test 1
+      run: |
+        ls
+        
     - name: Test 2
       run: |
         ls -l ./api-produit-latest.tar.gz
