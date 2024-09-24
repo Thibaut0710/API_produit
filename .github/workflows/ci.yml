@@ -21,31 +21,6 @@ permissions:
 
 jobs:
 
-  docker-container-artifact:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build Docker image
-        run: |
-          docker build -t api-produit:latest .
-
-      - name: Save Docker image to file
-        run: |
-          docker save api-produit:latest | gzip > api-produit-latest.tar.gz
-
-      - name: Upload Docker image as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: api-produit-docker-image
-          path: api-produit-latest.tar.gz
-    
-
   test:
     runs-on: ubuntu-latest
 
@@ -120,6 +95,40 @@ jobs:
         path: master
         retention-seconds: 600
 
+
+  docker-container-artifact:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: |
+          docker build -t api-produit:latest .
+
+      - name: Save Docker image to file
+        run: |
+          docker save api-produit:latest | gzip > api-produit-latest.tar.gz
+
+      - name: Upload Docker image as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-produit-docker-image
+          path: api-produit-latest.tar.gz
+    
+      - name: Release Docker image
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./api-produit-latest.tar.gz
+          asset_name: api-produit-latest.tar.gz
+          asset_content_type: application/gzip
+          
   release:
     #if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master'
     needs: build
@@ -130,32 +139,10 @@ jobs:
       uses: actions/checkout@v2
       with:
         token: ${{ secrets.GIT_TOKEN }}
-      
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: release_artifact
-        path: master
 
-    - name: Commit new version
+    - name: Zip source code
       run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git commit -am "CI: bump version to ${{ steps.package_version.outputs.version  }}"
-        git push https://${{ secrets.GIT_TOKEN }}@github.com/${{ github.repository }}.git
-    
-    - name: Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
-      with:
-        tag_name: v${{ steps.package_version.outputs.version }}
-        release_name: Release ${{ steps.package_version.outputs.version }}
-        draft: false
-        prerelease: false
-
-    - name: Compress Published APIs
-      run: |
-        zip -r API_Produit.zip master/publish/API_Produit
+        zip -r API_Produit.zip .
     
     - name: Upload Release Assets - API_Produit
       uses: actions/upload-release-asset@v1
