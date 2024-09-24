@@ -139,7 +139,7 @@ jobs:
         path: master
     
     - name: Download Docker image artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v3
       with:
         name: api-produit-docker-image
         path: api-produit-latest.tar.gz
