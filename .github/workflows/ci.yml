@@ -167,15 +167,6 @@ jobs:
     - name: Zip source code
       run: |
         zip -r API_Produit.zip .
-        
-    - name: Test 1
-      run: |
-        ls
-        
-    - name: Test 2
-      run: |
-        ls -l ./API_Produit.zip
-        ls -l ./api-produit-latest.tar.gz
 
     - name: Upload Docker image to release
       uses: actions/upload-release-asset@v1
