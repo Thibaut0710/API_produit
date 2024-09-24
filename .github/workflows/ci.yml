@@ -139,7 +139,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: api-produit-docker-image
-          path: ./ # Spécifier où vous voulez que l'artifact soit téléchargé
+          path: ./
 
       - name: Generate dynamic tag name
         id: generate_tag
@@ -166,7 +166,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./api-produit-latest.tar.gz # Le chemin où l'artifact est téléchargé
+          asset_path: ./api-produit-latest.tar.gz
           asset_name: api-produit-latest.tar.gz
           asset_content_type: application/gzip
           
