@@ -68,6 +68,11 @@ jobs:
       
     - name: Setup Newtonsoft.Json
       run: dotnet add package Newtonsoft.Json
+      
+    - name: Clean
+      run: |
+        dotnet clean ./API_Produit.Tests/API_Produit.Tests.csproj
+        dotnet clean ./API_Produit.Tests/API_Produit.Tests.csproj
     
     - name: Install Dependencies
       run: dotnet restore ./API_Produit.Tests/API_Produit.Tests.csproj
@@ -182,7 +187,7 @@ jobs:
       run: npm install -g redoc-cli
  
     - name: Generate HTML from openapi.json
-      run: npx @redocly/cli build-docs public/index.html ./openapi.json
+      run: npx @redocly/cli build-docs public/index.html
  
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
