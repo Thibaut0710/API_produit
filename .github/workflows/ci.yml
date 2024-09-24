@@ -151,8 +151,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
       with:
-        tag_name: ${{ steps.package_version.outputs.version }}
-        release_name: "Release ${{ steps.package_version.outputs.version }}"
+        tag_name: v1.0.0
+        release_name: "Release v1.0.0"
         draft: false
         prerelease: false
 
