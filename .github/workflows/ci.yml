@@ -119,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: api-produit-docker-image
-          path: master
+          path: api-produit-latest.tar.gz
           retention-seconds: 600
           
   release:
@@ -137,7 +137,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: release_artifact
-        path: master
+        path: api-produit-latest.tar.gz
     
     - name: Download Docker image artifact
       uses: actions/download-artifact@v3
