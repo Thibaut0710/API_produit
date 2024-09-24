@@ -71,17 +71,17 @@ jobs:
       
     - name: Clean
       run: |
-        dotnet clean ./API_Produit.Tests/API_Produit.Tests.csproj
-        dotnet clean API_Produit.csproj
+        dotnet clean
+        dotnet clean
     
     - name: Install Dependencies
-      run: dotnet restore ./API_Produit.Tests/API_Produit.Tests.csproj
+      run: dotnet restore
 
     - name: Build
-      run: dotnet build ./API_Produit.Tests/API_Produit.Tests.csproj --no-restore
+      run: dotnet build --no-restore
 
     - name: Run Unit Tests
-      run: dotnet test ./API_Produit.Tests/API_Produit.Tests.csproj
+      run: dotnet test
 
   build:
     needs: test
