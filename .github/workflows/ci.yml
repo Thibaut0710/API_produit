@@ -115,6 +115,17 @@ jobs:
         run: |
           docker save api-produit:latest | gzip > api-produit-latest.tar.gz
 
+        
+      - name: Upload Docker image to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./
+          asset_name: api-produit-latest.tar.gz
+          asset_content_type: application/gzip
+        
       - name: Upload Docker image as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -177,18 +188,4 @@ jobs:
         asset_path: ./API_Produit.zip
         asset_name: API_Produit.zip
         asset_content_type: application/zip
-        
-    - name: Test
-      run: |
-        ls ./
-        
-    - name: Upload Docker image to release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./
-        asset_name: api-produit-latest.tar.gz
-        asset_content_type: application/gzip
     
