@@ -69,6 +69,9 @@ jobs:
     - name: Setup Newtonsoft.Json
       run: dotnet add package Newtonsoft.Json
       
+    - name: Setup Microsoft.NET.Test.Sdk
+      run: dotnet add package Microsoft.NET.Test.Sdk
+      
     - name: Clean
       run: |
         dotnet clean
