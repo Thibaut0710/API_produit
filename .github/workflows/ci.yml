@@ -89,7 +89,7 @@ jobs:
         echo "Published API_Produit to master/publish/API_Produit"
 
     - name: Upload Build Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: release_artifact
         path: master
