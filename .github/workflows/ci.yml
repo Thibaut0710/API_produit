@@ -119,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: api-produit-docker-image
-          path: api-produit-latest.tar.gz
+          path: master
           retention-seconds: 600
           
   release:
@@ -143,7 +143,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: api-produit-docker-image
-        path: api-produit-latest.tar.gz
+        path: master
 
     - name: Generate dynamic tag name
       id: generate_tag
