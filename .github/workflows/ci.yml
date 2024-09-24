@@ -175,26 +175,3 @@ jobs:
         asset_path: ./API_Produit.zip
         asset_name: API_Produit.zip
         asset_content_type: application/zip
-
-  deploy_pages:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2 
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
- 
-    - name: Install redoc-cli
-      run: npm install -g redoc-cli
- 
-    - name: Generate HTML from openapi.json
-      run: npx @redocly/cli build-docs public/index.html
- 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.MAX_TOKEN }}
-        publish_dir: ./public
