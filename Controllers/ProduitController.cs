@@ -1,4 +1,4 @@
-﻿using API_produit.Context;
+using API_produit.Context;
 using API_produit.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +25,7 @@ namespace API_produit.Controllers
 
         // GET: api/products/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Produit>> GetProduct(int id)
+        public async Task<ActionResult<Produit>> GetProduit(int id)
         {
             var product = await _context.Produits.FindAsync(id);
 
@@ -75,12 +75,12 @@ namespace API_produit.Controllers
             await _context.SaveChangesAsync();
 
             // Retourner une réponse avec le code 201 Created et l'objet produit ajouté
-            return CreatedAtAction(nameof(GetProduct), new { id = produit.Id }, produit);
+            return CreatedAtAction(nameof(GetProduit), new { id = produit.Id }, produit);
         }
 
         // PUT: api/products/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Produit product)
+        public async Task<IActionResult> PutProduit(int id, Produit product)
         {
             if (id != product.Id)
             {
@@ -95,7 +95,7 @@ namespace API_produit.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductExists(id))
+                if (!ProduitExists(id))
                 {
                     return NotFound(new { message = "Produit non trouvé." });
                 }
@@ -110,7 +110,7 @@ namespace API_produit.Controllers
 
         // DELETE: api/products/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduit(int id)
         {
             var product = await _context.Produits.FindAsync(id);
             if (product == null)
@@ -124,7 +124,7 @@ namespace API_produit.Controllers
             return Ok(new { message = "Produit supprimé avec succès." });
         }
 
-        private bool ProductExists(int id)
+        private bool ProduitExists(int id)
         {
             return _context.Produits.Any(e => e.Id == id);
         }
