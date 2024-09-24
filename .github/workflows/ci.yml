@@ -78,7 +78,9 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore
+      run: |
+        dotnet build --no-restore
+        dotnet build ./API_Produit.Tests/API_Produit.Tests.csproj --no-restore
 
     - name: Run Unit Tests
       run: dotnet test
