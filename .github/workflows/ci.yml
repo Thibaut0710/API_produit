@@ -65,6 +65,9 @@ jobs:
         
     - name: Setup InMemory
       run: dotnet add package Microsoft.EntityFrameworkCore.InMemory
+      
+    - name: Setup Newtonsoft.Json
+      run: dotnet add package Newtonsoft.Json
     
     - name: Install Dependencies
       run: dotnet restore API_Produit.csproj
@@ -72,7 +75,7 @@ jobs:
     - name: Build
       run: dotnet build API_Produit.csproj --no-restore
 
-    - name: Run Tests Non-Graphic
+    - name: Run Unit Tests
       run: dotnet test API_Produit.csproj
 
   build:
