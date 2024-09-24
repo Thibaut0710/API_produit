@@ -136,13 +136,6 @@ jobs:
       with:
         name: release_artifact
         path: master
-  
-    - name: Bump version
-      id: package_version
-      uses: KageKirin/bump-csproj-version@v0
-      with:
-        file: API_Produit.csproj
-        patch: true
 
     - name: Commit new version
       run: |
